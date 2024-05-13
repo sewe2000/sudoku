@@ -1,6 +1,6 @@
 'use client'
 import styles from './page.module.css';
-import Button from "@/app/ui/components/button/button";
+import Button, { Color } from "@/app/ui/components/button/button";
 import {useState} from "react";
 import Board, {Difficulty} from "@/app/ui/components/board/board";
 
@@ -23,9 +23,9 @@ export default function Home() {
                 {
                     hasGameStarted? <Board difficulty={difficulty}/> :
                     <>
-                        <Button onClick={() => setSpecifiedDifficulty(Difficulty.easy)} text="Easy" color="green" />
-                        <Button onClick={() => setSpecifiedDifficulty(Difficulty.medium)} text="Medium" color="blue" />
-                        <Button onClick={() => setSpecifiedDifficulty(Difficulty.hard)} text="Hard" color="red" />
+                        <Button onClick={() => setSpecifiedDifficulty(Difficulty.easy)} text="Easy" color={Color.green} />
+                        <Button onClick={() => setSpecifiedDifficulty(Difficulty.medium)} text="Medium" color={Color.blue} />
+                        <Button onClick={() => setSpecifiedDifficulty(Difficulty.hard)} text="Hard" color={Color.red} />
                     </>
                 }
           </div>

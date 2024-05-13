@@ -1,7 +1,7 @@
 import styles from '@/app/ui/components/button/button.module.css';
 import {MouseEventHandler} from "react";
 
-enum Color {
+export enum Color {
     green = "green",
     blue = "blue",
     red = "red",

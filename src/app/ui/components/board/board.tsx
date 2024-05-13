@@ -1,19 +1,18 @@
 import styles from '@/app/ui/components/board/board.module.css';
-import {FormEvent, MutableRefObject, useCallback, useEffect, useRef} from "react";
+import {FormEvent, MutableRefObject, useEffect, useRef} from "react";
 
 const numberOfElementsInRow = 9;
 const numberOfSquaresInRow = 3;
 const squareDimension = numberOfElementsInRow / numberOfSquaresInRow;
-const numberOfSquares = numberOfElementsInRow * numberOfElementsInRow / (squareDimension * squareDimension);
 const handleInput = (event: FormEvent<HTMLInputElement>) => {
-  const inputElement = event.target;
+  const inputElement = event.target as HTMLInputElement;
   if (/[^1-9]/.test(inputElement.value) || inputElement.value.length > 1) {
       inputElement.value = inputElement.value.slice(0, -1);
   }
 };
 
-const handleArrows = (event: FormEvent<HTMLInputElement>, ref: MutableRefObject<HTMLInputElement[]>) => {
-  const currentInputId = Number(event.target.id);
+const handleArrows = (event: React.KeyboardEvent<HTMLInputElement>, ref: MutableRefObject<HTMLInputElement[]>) => {
+  const currentInputId = Number((event.target as HTMLInputElement).id);
   const numberOfInputs = numberOfElementsInRow * numberOfElementsInRow;
   let selectedInput: HTMLInputElement;
 
@@ -55,18 +54,6 @@ const getColumnFromIndex = (index: number) => index % numberOfElementsInRow;
 const getSquareFromIndex = (index: number) =>
     Math.floor(getRowFromIndex(index) / squareDimension) * numberOfSquaresInRow +
     Math.floor(getColumnFromIndex(index) / squareDimension);
-
-const getSquareIndexes = (squareNumber: number): number[] => {
-    const initialIndex = squareNumber * squareDimension +
-        ((squareDimension - 1) * numberOfElementsInRow) *
-        Math.floor(squareNumber / numberOfSquaresInRow);
-
-    const result:number[] = new Array(squareDimension * squareDimension);
-    for (let i = 0; i < squareDimension ** 2; i++) {
-        result[i] = initialIndex + (Math.floor(i / squareDimension) * numberOfElementsInRow) + (i % squareDimension);
-    }
-    return result;
-};
 
 const initBoard = (difficulty: Difficulty, inputsRef: MutableRefObject<HTMLInputElement[]>, boardState: InternalState,
                    exampleSolve: (number|null)[]) => {
@@ -121,15 +108,6 @@ function fillCell(data: FillCellInterface): boolean {
         !data.state.rows[row].has(number) &&
         !data.state.cols[col].has(number) &&
         !data.state.squares[square].has(number));
-    /* if (!availableNumbers.length) {
-        data.state.rows[getRowFromIndex(data.index - 1)].delete(data.cellArray[data.index - 1]);
-        data.state.cols[getColumnFromIndex(data.index - 1)].delete(data.cellArray[data.index - 1]);
-        data.state.squares[getSquareFromIndex(data.index - 1)].delete(data.cellArray[data.index - 1]);
-        data.cellArray[data.index - 1] = 0;
-        data.index = Math.max(data.index - 2, 0);
-        return false;
-    } */
-
     const availableNumbersIndex = getRandomNumber(0, availableNumbers.length - 1);
     const chosenNumber = availableNumbers[availableNumbersIndex];
 
@@ -169,35 +147,6 @@ function generateExampleSudoku(sudokuArray: (number|null)[]) {
     const squares: Set<number>[] =
         Array(numberOfElementsInRow**2).fill(null).map(() => new Set<number>(numbersArray));
 
-    /*const diagonalSquaresIndexes: number[] = new Array(numberOfSquaresInRow);
-    for (let i = 0; i < diagonalSquaresIndexes.length; i++) {
-        diagonalSquaresIndexes[i] = i * (numberOfSquaresInRow + 1);
-    }
-
-    Fill diagonal squares first */
-    /*for (const diagonalSquareIndex of diagonalSquaresIndexes) {
-        const indexesInsideSquare = getSquareIndexes(diagonalSquareIndex);
-        for (const index of indexesInsideSquare) {
-            fillCell({
-                index,
-                cellArray: sudokuArray,
-                state: sudokuState,
-                squaresStatus: squares,
-                availableNumbers: numbersArray
-            });
-        }
-    }*/
-    /*for (let i = 0; i < sudokuArray.length; i++) {
-        if (sudokuArray[i])
-            continue;
-        fillCell({
-            index: i,
-            cellArray: sudokuArray,
-            state: sudokuState,
-            squaresStatus: squares,
-            availableNumbers: numbersArray
-        });
-    }*/
     let sudoku2d: number[][] = Array(numberOfElementsInRow).fill(null).map(() => new Array(numberOfElementsInRow));
     for(let i = 0; i < numberOfElementsInRow; i++) {
         fillCell({
@@ -239,9 +188,9 @@ export default function Board(props: BoardProps) {
   const inputsRef: MutableRefObject<HTMLInputElement[]> = useRef(new Array(numberOfElementsInRow * numberOfElementsInRow));
 
   const internalState = useRef<InternalState>({
-    rows: Array(numberOfElementsInRow).fill(null).map(e => new Set<number>()),
-    cols: Array(numberOfElementsInRow).fill(null).map(e => new Set<number>()),
-    squares: Array(numberOfElementsInRow).fill(null).map(e => new Set<number>()),
+    rows: Array(numberOfElementsInRow).fill(null).map(_ => new Set<number>()),
+    cols: Array(numberOfElementsInRow).fill(null).map(_ => new Set<number>()),
+    squares: Array(numberOfElementsInRow).fill(null).map(_ => new Set<number>()),
   });
   const exampleSudoku: (number|null)[] = new Array(numberOfElementsInRow * numberOfElementsInRow).fill(null);
   let inputCounter = 0;
@@ -253,11 +202,10 @@ export default function Board(props: BoardProps) {
       return () => tempRef.forEach((inputElement) => {
           inputElement.removeAttribute('disabled');
           inputElement.value = '';
-          //exampleSudoku.fill(null);
       })
   });
 
-  const tdElements = [...Array(numberOfElementsInRow * numberOfElementsInRow)].map((e, i) =>
+  const tdElements = [...Array(numberOfElementsInRow * numberOfElementsInRow)].map((_, i) =>
       <td key={i}>
         <input onChange={handleInput} onKeyDown={event => handleArrows(event, inputsRef)}
                          id={`${inputCounter++}`} ref={ (node) => {
@@ -269,7 +217,7 @@ export default function Board(props: BoardProps) {
       }
       }/>
       </td>);
-  const trElements = [...Array(numberOfElementsInRow)].map((e, i) =>
+  const trElements = [...Array(numberOfElementsInRow)].map((_, i) =>
     <tr key={i}>{tdElements.slice(i * numberOfElementsInRow, i * numberOfElementsInRow + numberOfElementsInRow)}</tr>);
 
 
