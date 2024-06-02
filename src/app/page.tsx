@@ -1,6 +1,6 @@
 'use client'
 import styles from './page.module.css';
-import Button, { Color } from "@/app/ui/components/button/button";
+import Button, {Color} from "@/app/ui/components/button/button";
 import {useState} from "react";
 import Board, {Difficulty} from "@/app/ui/components/board/board";
 
@@ -19,9 +19,9 @@ export default function Home() {
         <h1 className={styles.title}>Sudoku game</h1>
         <main>
             { !hasGameStarted && <h2 className={styles.subtitle}>Choose the difficulty</h2> }
-            <div className={styles.buttonContainer}>
+            <div className={!hasGameStarted? styles.buttonContainer : styles.centerContainer}>
                 {
-                    hasGameStarted? <Board difficulty={difficulty}/> :
+                    hasGameStarted? <Board difficulty={difficulty} setHasGameStarted={setHasGameStarted} /> :
                     <>
                         <Button onClick={() => setSpecifiedDifficulty(Difficulty.easy)} text="Easy" color={Color.green} />
                         <Button onClick={() => setSpecifiedDifficulty(Difficulty.medium)} text="Medium" color={Color.blue} />
