@@ -1,0 +1,21 @@
+.container {
+	display: flex;
+	justify-content: center;
+}
+
+.ol {
+	color: white;
+	font-weight: bold;
+	font-size: 2rem;
+}
+
+.ol li {
+	margin: auto;
+}
+
+.h1 {
+	color: white;
+	text-align: center;
+	font-size: 3rem;
+	font-family: sans-serif;
+}
