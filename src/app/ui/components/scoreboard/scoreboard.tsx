@@ -23,8 +23,9 @@ const Scoreboard = (props: ScoreboardProps) => {
   };
   return (
         <>
+            {props.scores.length === 0 && <h1 className={style.h1} >You have no records yet</h1>}
             {props.scores.length === 1 && <h1 className={style.h1}>Here is the best time</h1> }
-            {props.scores.length !== 1 && <h1 className={style.h1}>Here are top {props.scores.length} times</h1> }
+            {props.scores.length > 1 && <h1 className={style.h1}>Here are top {props.scores.length} times</h1> }
             <div className={style.container}>
                 <ol className={style.ol}>
                     {
@@ -33,7 +34,7 @@ const Scoreboard = (props: ScoreboardProps) => {
                 </ol>
             </div>
             <div className={style.container}>
-                <Button onClick={onClick} text='Wróć' color={Color.white}/>
+                <Button onClick={onClick} text='Return' color={Color.white}/>
             </div>
         </>
     );
