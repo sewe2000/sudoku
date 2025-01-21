@@ -244,6 +244,7 @@ export enum Difficulty {
 interface BoardProps {
   difficulty: Difficulty;
   setHasGameStarted: Function;
+  setHasGameEnded: Function;
 }
 
 
@@ -269,7 +270,8 @@ export default function Board(props: BoardProps) {
       }
   }, [props.difficulty]);
     
-  if (isGameOver)
+  if (isGameOver) {
+    props.setHasGameEnded(true);
     return (
         <>
             <h2 className={styles.h1}>Congratulations! You&apos;ve solved the sudoku puzzle</h2>
@@ -278,7 +280,7 @@ export default function Board(props: BoardProps) {
             </div>
         </>
     );
-
+  }
   let inputCounter = 0;
 
   const tdElements = [...Array(numberOfElementsInRow * numberOfElementsInRow)].map((_, i) =>

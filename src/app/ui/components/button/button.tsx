@@ -5,6 +5,7 @@ export enum Color {
     green = "green",
     blue = "blue",
     red = "red",
+    white = "white"
 }
 interface PropsLayout {
     text: string;

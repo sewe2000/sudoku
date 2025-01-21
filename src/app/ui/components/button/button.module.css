@@ -21,9 +21,20 @@
     border-color: red;
 }
 
+.white {
+    color: white;
+    border-color: white;
+}
+
 .button:active,
 .button:hover {
     background-color: white;
+}
+
+.white:hover {
+    background-color: white;
+    color: black;
+    border-color: black;
 }
 
 @media screen and (max-width: 800px) {
