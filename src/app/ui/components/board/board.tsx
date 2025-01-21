@@ -256,31 +256,28 @@ export default function Board(props: BoardProps) {
 
   generateExampleSudoku(exampleSudoku.current);
   const board = useRef<Sudoku>(new Array(numberOfElementsInRow * numberOfElementsInColumn).fill(null));
+  const {setHasGameEnded} = props;
 
   useEffect(() => {
       initBoard(props.difficulty, inputsRef, exampleSudoku.current, board.current);
 
+      const inputsRefCopy = inputsRef.current;
+      const boardCopy = board.current;
+
+      if (isGameOver) {
+        setHasGameEnded(true);
+      }
       return () => {
-        inputsRef.current.forEach(inputField => {
+        inputsRefCopy.forEach(inputField => {
             inputField.value = '';
             inputField.removeAttribute('readonly');
             inputField.style.color = '';
         });
-        board.current.fill(null);
+        boardCopy.fill(null);
       }
-  }, [props.difficulty]);
+
+  }, [props.difficulty, isGameOver, setHasGameEnded]);
     
-  if (isGameOver) {
-    props.setHasGameEnded(true);
-    return (
-        <>
-            <h2 className={styles.h1}>Congratulations! You&apos;ve solved the sudoku puzzle</h2>
-            <div>
-                <Button text='Play again' color={Color.green} onClick={() => props.setHasGameStarted(false)}/>
-            </div>
-        </>
-    );
-  }
   let inputCounter = 0;
 
   const tdElements = [...Array(numberOfElementsInRow * numberOfElementsInRow)].map((_, i) =>

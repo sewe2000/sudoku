@@ -1,7 +1,7 @@
 'use client'
 import styles from './page.module.css';
 import Button, {Color} from "@/app/ui/components/button/button";
-import {useEffect, useRef, useState} from "react";
+import {memo, useCallback, useEffect, useRef, useState} from "react";
 import Board, {Difficulty} from "@/app/ui/components/board/board";
 import Timer from './ui/components/timer/timer';
 import Scoreboard from './ui/components/scoreboard/scoreboard';
@@ -11,7 +11,9 @@ export default function Home() {
   const [hasGameStarted, setHasGameStarted] = useState<boolean>(false);
   const [hasGameEnded, setHasGameEnded] = useState<boolean>(false);
   const [currentTime, setCurrentTime] = useState<number>(0);
-  const timeSaved = useRef<bool>(false);
+  const [hasScoreboardBeenCalled, setHasScoreboardBeenCalled] = useState<boolean>(false);
+  const timeSaved = useRef<boolean>(false);
+  const bestTimes = useRef<string>('');
 
   const fetchBestTimes = () => {
       if (typeof window === 'undefined')
@@ -19,17 +21,17 @@ export default function Home() {
       let trial = localStorage.getItem('times');
       if (!trial) {
             localStorage.setItem('times', JSON.stringify([]));
-            bestTimes = '';
+            bestTimes.current = '';
             return;
       }
-      bestTimes = localStorage.getItem('times') ?? '';
+      bestTimes.current = localStorage.getItem('times') ?? '';
   };
 
-  let bestTimes: string = '';
 
+  const memoizedFetcher = useCallback(fetchBestTimes, []);
   useEffect(() => {
-    fetchBestTimes();
-  }, []);
+        memoizedFetcher();
+  }, [memoizedFetcher]);
   
 
   const setSpecifiedDifficulty = (difficulty: Difficulty) => {
@@ -41,7 +43,7 @@ export default function Home() {
     if (typeof window === 'undefined')
       return;
     const NO_TIMES = 5;
-    let bestTimesArray: number[] = bestTimes? JSON.parse(bestTimes) : [];
+    let bestTimesArray: number[] = bestTimes.current? JSON.parse(bestTimes.current) : [];
     bestTimesArray.push(seconds);
     bestTimesArray.sort((a, b) => a - b);
     bestTimesArray = bestTimesArray.slice(0, NO_TIMES);
@@ -53,18 +55,27 @@ export default function Home() {
 
   if (hasGameEnded && typeof window !== 'undefined') {
     fetchBestTimes();
-    if (!timeSaved.current) {
+    if (!timeSaved.current && !hasScoreboardBeenCalled) {
         saveTime(currentTime);
         timeSaved.current = true;
     } else {
             timeSaved.current = false;
     }
     fetchBestTimes();
-    const scores: number[] = JSON.parse(bestTimes);
+    const scores: number[] = JSON.parse(bestTimes.current);
     return (
-        <Scoreboard scores={scores} setHasGameEnded={setHasGameEnded} setHasGameStarted={setHasGameStarted}/>
+        <Scoreboard scores={scores}
+                    setHasGameEnded={setHasGameEnded}
+                    setHasGameStarted={setHasGameStarted}
+                    setHasBeenCalled={setHasScoreboardBeenCalled}
+        />
     )
   }
+
+  const showLedger = () => {
+    setHasScoreboardBeenCalled(true);
+    setHasGameEnded(true);
+  };
 
   return (
       <>
@@ -82,6 +93,10 @@ export default function Home() {
                     </>
                 }
           </div>
+          { !hasGameStarted &&
+          <div className={styles.centerContainer}>
+                <Button text='Ledger' color={Color.white} onClick={showLedger}/>
+          </div> }
         </main>
       </>
   );
